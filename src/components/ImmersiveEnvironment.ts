@@ -5,6 +5,7 @@ import {RectAreaLightUniformsLib} from 'three/addons/lights/RectAreaLightUniform
 import type {PhotoMaterials} from './PhotoMaterials';
 
 export function createTourEnvironment(scene:THREE.Scene,renderer:THREE.WebGLRenderer,photos:PhotoMaterials,mobile:boolean){
+ if(mobile)return createMobileEnvironment(scene,renderer,photos);
  scene.background=null;scene.fog=new THREE.FogExp2('#bdcbd1',.0015);
  const sky=new Sky();sky.name='Luz_diurna';sky.scale.setScalar(1500);
  const skyUniforms=sky.material.uniforms;
@@ -59,4 +60,26 @@ export function createTourEnvironment(scene:THREE.Scene,renderer:THREE.WebGLRend
  const update=(p:number)=>{water.visible=p<.14;if(scene.fog instanceof THREE.FogExp2)scene.fog.density=.0015*(1-Math.min(1,Math.max(0,(p-.10)/.06)));};
  const dispose=()=>{reflectionTargets.forEach(t=>t.dispose());pmrem.dispose();water.dispose();sun.shadow.dispose();windowLight.shadow.dispose();};
  return {capture,update,dispose,hiddenForAO};
+}
+
+/** Single render path: no floating-point cube captures, refraction or planar rerenders. */
+function createMobileEnvironment(scene:THREE.Scene,renderer:THREE.WebGLRenderer,photos:PhotoMaterials){
+ scene.background=new THREE.Color('#a9c2d1');scene.fog=new THREE.FogExp2('#bdcbd1',.0015);
+ const hemi=new THREE.HemisphereLight('#e1eaf0','#827c72',1.35);scene.add(hemi);
+ const sun=new THREE.DirectionalLight('#fff3dc',2.15);sun.position.set(-45,75,40);sun.target.position.set(0,15,-15);
+ sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);
+ Object.assign(sun.shadow.camera,{left:-62,right:62,top:70,bottom:-65,near:1,far:190});sun.shadow.normalBias=.035;sun.shadow.bias=-.0001;scene.add(sun,sun.target);
+ const bounce=new THREE.DirectionalLight('#d2e2e7',.4);bounce.position.set(35,35,-45);scene.add(bounce);
+ const groundMat=photos.apply(new THREE.MeshStandardMaterial(),'stone',{size:[.8,1.2],grout:1,color:'#a4aaa5',contrast:.45});
+ const shape=new THREE.Shape();shape.moveTo(-450,-450);shape.lineTo(450,-450);shape.lineTo(450,450);shape.lineTo(-450,450);shape.closePath();
+ const hole=new THREE.Path();hole.moveTo(-23,-12);hole.lineTo(-23,49);hole.lineTo(31,49);hole.lineTo(31,-12);hole.closePath();shape.holes.push(hole);
+ const ground=new THREE.Mesh(new THREE.ShapeGeometry(shape),groundMat);ground.rotation.x=-Math.PI/2;ground.position.y=-.145;ground.receiveShadow=true;scene.add(ground);
+ const waterShape=new THREE.Shape();for(let i=0;i<100;i++){const a=i/100*Math.PI*2,r=1+.2*Math.cos(3*a)+.09*Math.sin(5*a),x=-4+11*r*Math.cos(a)*.95,z=29+7*r*Math.sin(a)*.94;if(i===0)waterShape.moveTo(x,-z);else waterShape.lineTo(x,-z);}waterShape.closePath();
+ const water=new THREE.Mesh(new THREE.ShapeGeometry(waterShape),new THREE.MeshStandardMaterial({color:'#728f97',roughness:.24,metalness:.15}));water.rotation.x=-Math.PI/2;water.position.y=.224;scene.add(water);
+ return {
+  hiddenForAO:[] as THREE.Object3D[],
+  capture:()=>{renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;},
+  update:(p:number)=>{water.visible=p<.14;if(scene.fog instanceof THREE.FogExp2)scene.fog.density=.0015*(1-Math.min(1,Math.max(0,(p-.10)/.06)));},
+  dispose:()=>{sun.shadow.dispose();},
+ };
 }

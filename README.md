@@ -41,3 +41,19 @@ Malla y perfiles: [brochure oficial](https://faeusach.cl/brochures/2026-ice.pdf)
 Sora y Source Sans 3 son fuentes distribuidas bajo SIL Open Font License. El proyecto no otorga una licencia abierta sobre marcas, fotografías ni otros recursos de terceros.
 
 Personajes 3D: Renderpeople. Recursos sujetos a licencia; este repositorio no concede derechos de reutilización o redistribución sobre ellos. Véase `public/people-v4/LICENCIA.txt`.
+
+## Recorrido en móviles
+
+La calidad se adapta a pantallas estrechas y dispositivos táctiles, también en horizontal. Se conserva la geometría V4 y la distribución de 243 personas (144 sentadas); el perfil móvil usa texturas de hasta 1024 px, iluminación con una sombra de 1024 px y una sola pasada de renderizado. Los reflejos planos, las capturas cúbicas y la refracción se reservan al escritorio.
+
+El edificio se descarga comprimido sin pérdida (19,2 MB → 3,0 MB). Se presenta antes de cargar las personas, que llegan en lotes. Los modelos y texturas móviles suman 14,8 MB, frente a los 37,1 MB anteriores; esto no incluye JavaScript, fuentes ni fotografías editoriales. Los originales permanecen en el repositorio.
+
+«Comenzar recorrido» reproduce la ruta completa en unos 75 segundos. El scroll, el control de avance y las etapas permiten recorrerla manualmente. La preferencia de movimiento reducido se respeta hasta una activación explícita. Si la carga falla o excede el tiempo de espera, se ofrece reintento y acceso al programa.
+
+Para regenerar los recursos de transporte y las variantes de resolución en macOS:
+
+```sh
+python3 scripts/prepare-mobile-assets.py
+```
+
+Validación: compilación TypeScript/Vite, integridad binaria del modelo descomprimido, inventario de personajes, vista vertical 393 × 852, orientación horizontal y recuperación de una descarga HTTP 503 en navegador Chromium. Esta comprobación no equivale a una prueba en un iPhone físico o Safari iOS.

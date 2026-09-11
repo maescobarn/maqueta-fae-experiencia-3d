@@ -13,3 +13,42 @@
 @media(max-width:1050px){.aula-editorial{gap:5%;padding:85px 5vw;min-height:690px}.aula-editorial-copy h2{font-size:44px}.v-comparison{grid-template-columns:1fr;gap:35px}.v-comparison>div>p:not(.v-eyebrow){max-width:580px}.admission-layout{gap:6%}.admission-next{gap:6%}}
 @media(max-width:759px){.aula-editorial{padding:65px 24px;display:flex;flex-direction:column;align-items:stretch;gap:36px;min-height:0}.aula-editorial-copy h2{font-size:42px}.aula-editorial-copy h2 span{display:inline!important}.aula-editorial-copy h2 span::after{content:' '}.aula-editorial-copy>p:not(.v-eyebrow){font-size:17px;max-width:none}.aula-editorial-copy .v-link{font-size:13px}.aula-editorial-photo{margin:0}.aula-editorial-photo figcaption>span{font-size:8px}.aula-editorial-photo figcaption>p{font-size:14px}.admission-section .v-section-line{margin-bottom:35px;align-items:center;gap:16px}.admission-section .v-section-line>span{max-width:120px;line-height:1.5}.admission-section .v-section-line a{font-size:10px;gap:5px;white-space:nowrap}.admission-layout{grid-template-columns:1fr;gap:40px}.admission-heading h2{font-size:49px;margin:20px 0}.admission-heading>p:not(.v-eyebrow){font-size:18px}.admission-heading .v-link{margin-top:18px}.admission-profiles>h3{font-size:18px}.admission-profiles h4{font-size:17px}.admission-profiles li{gap:15px;padding:20px 0}.admission-profiles li p{font-size:15px}.admission-note{font-size:12px}.admission-next{grid-template-columns:1fr;gap:26px;margin-top:35px;padding-top:27px}.admission-next h3{font-size:22px}.admission-actions .v-button{font-size:13px;padding:15px}.v-table-wrapper caption{font-size:11px}.v-table-wrapper table{min-width:580px}.comparison-scroll{padding-bottom:12px}.accreditation-cell a{font-size:13px}.v-comparison-details{font-size:12px}}
 .v-table-wrapper{min-width:0}.comparison-scroll{max-width:100%}
+
+/* Mobile tour: stable canvas, native vertical touch scrolling and visible recovery. */
+.v-world>.v-building-photo{position:absolute;inset:0}
+.campus-webgl{touch-action:pan-y}
+.v-opening-bottom{flex-wrap:wrap}
+.v-opening-bottom .v-load-status{flex-basis:100%;max-width:420px;margin:14px 0 0;font-size:13px;line-height:1.5;color:#edf0ed}
+.is-reduced .v-opening-bottom button{display:flex}
+.v-transport{padding-bottom:env(safe-area-inset-bottom,0px)}
+.v-menu-toggle,.v-play-control>button{min-width:44px;min-height:44px;touch-action:manipulation}
+@media(max-width:759px),(pointer:coarse){
+ .v-waypoints{display:flex;flex-direction:row;left:20px;right:20px;bottom:calc(94px + env(safe-area-inset-bottom,0px));gap:3px;justify-content:space-between}
+ .v-waypoints button{min-width:44px;min-height:44px;padding:6px 3px;justify-content:center;gap:5px;font-size:0;touch-action:manipulation}
+ .v-waypoints button span{font-size:11px}.v-waypoints button i{width:12px}
+ .v-stage{height:100svh;min-height:480px}
+ .v-transport{height:calc(86px + env(safe-area-inset-bottom,0px));box-sizing:border-box}
+ .v-scene-top button{min-height:44px;touch-action:manipulation}
+ .v-opening{top:24%;left:24px;right:24px}
+ .v-opening-bottom .v-load-status{font-size:12px;max-width:290px;margin-top:12px}
+ .v-opening-bottom>button{min-height:48px}
+ .v-transport input{min-height:44px;touch-action:pan-y}
+ .v-location-title{bottom:calc(165px + env(safe-area-inset-bottom,0px))}
+}
+@media(max-height:540px) and (orientation:landscape){
+ .v-stage{min-height:320px}.v-header{height:64px}.v-brand img{width:132px;height:auto}
+ .v-scene-top{top:70px}.v-opening{top:110px;left:24px;right:24px}
+ .v-opening-index{display:none}.v-opening h1{font-size:34px;line-height:1.04;max-width:50%;margin:0}
+ .v-opening-bottom{position:absolute;left:52%;right:0;top:0;gap:8px}
+ .v-opening-bottom>p:first-child{font-size:14px;margin-bottom:0}.v-opening-bottom .v-load-status{font-size:11px;margin-top:4px}
+ .v-waypoints{left:40%;bottom:68px}.v-transport{height:62px}.v-location-title{left:24px;bottom:120px;max-width:70%}.v-location-title h2{font-size:27px}
+}
+
+@media(max-width:759px){.v-waypoints{left:12px;right:12px;gap:0}.v-waypoints button{flex:1;min-width:0}}
+@media(max-height:540px) and (orientation:landscape){
+ .v-desktop-nav{display:none}.v-menu-toggle{display:flex}
+ .v-waypoints{display:flex;flex-direction:row;top:auto;bottom:68px;left:40%;right:22px;gap:0;justify-content:space-between;background:none}
+ .v-waypoints button{flex:1;min-width:0;min-height:44px;justify-content:center;padding:6px 3px;gap:5px;font-size:0}
+ .v-waypoints button span{font-size:11px}.v-waypoints button i{width:12px}
+ .v-mobile-menu{top:64px;max-height:calc(100svh - 64px);overflow-y:auto}
+}

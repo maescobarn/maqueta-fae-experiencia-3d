@@ -30,10 +30,10 @@ export const keys:Key[]=[
 export function pose(p:number,aspect:number){
  let a=keys[0],b=keys[1];for(let i=0;i<keys.length-1;i++){a=keys[i];b=keys[i+1];if(p<=b.p)break;}
  const t=smooth(a.p,b.p,p),n=clamp((1.2-aspect)/.7),pos=a.pos.map((x,i)=>x+(b.pos[i]-x)*t) as V;
- pos[2]+=40*n*(1-smooth(0,.12,p));
  let delta=b.yaw-a.yaw;while(delta>Math.PI)delta-=2*Math.PI;while(delta< -Math.PI)delta+=2*Math.PI;
  let yaw=a.yaw+delta*t,pitch=a.pitch+(b.pitch-a.pitch)*t;
  if(p>=.29&&p<=.40){yaw=keys[6].yaw+Math.PI*2*smooth(.29,.40,p);pitch=keys[6].pitch;}
+ const retreat=40*n*(1-smooth(0,.12,p));pos[0]-=Math.sin(yaw)*retreat;pos[2]+=Math.cos(yaw)*retreat;
  return {position:pos,target:[pos[0]+Math.sin(yaw)*Math.cos(pitch)*10,pos[1]+Math.sin(pitch)*10,pos[2]-Math.cos(yaw)*Math.cos(pitch)*10] as V,fov:a.fov+(b.fov-a.fov)*t+n*8,label:p===0?a.label:b.label,yaw,pitch};
 }
 export const stops=[{p:0,label:'Exterior'},{p:.21,label:'Hall'},{p:.29,label:'Giro 360°'},{p:.435,label:'Escaleras'},{p:.585,label:'Auditorio'},{p:.685,label:'Audiencia'},{p:.755,label:'Pantalla'}];

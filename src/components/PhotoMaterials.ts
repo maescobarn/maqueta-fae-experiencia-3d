@@ -77,7 +77,7 @@ export class PhotoMaterials{
  private textures=new Map<string,THREE.Texture>();
  private pending:Promise<unknown>[]=[];
  private alive=true;
- private bitmaps:ImageBitmap[]=[];
+
  readonly materials=new Set<THREE.MeshStandardMaterial>();
  readonly glass=new Set<THREE.MeshPhysicalMaterial>();
  readonly failures:string[]=[];
@@ -87,15 +87,14 @@ export class PhotoMaterials{
   const tex=new THREE.Texture();tex.name=file;tex.colorSpace=THREE.SRGBColorSpace;
   tex.wrapS=tex.wrapT=THREE.ClampToEdgeWrapping;tex.anisotropy=this.mobile?4:8;
   this.textures.set(file,tex);
-  const url=assetUrl("/materials/usach-originals/")+file;
-  this.pending.push(fetch(url).then(r=>{if(!r.ok)throw new Error(file);return r.blob();}).then(async blob=>{
-   // Decode unchanged originals at an appropriate GPU resolution, preserving aspect.
-   const full=await createImageBitmap(blob);
-   const max=this.mobile?2048:4096,k=Math.min(1,max/Math.max(full.width,full.height));
-   full.close();
-   const bitmap=await createImageBitmap(blob,{imageOrientation:'flipY',resizeWidth:Math.round(photoSamples.imageSizes[file][0]*k),resizeHeight:Math.round(photoSamples.imageSizes[file][1]*k),resizeQuality:'high',premultiplyAlpha:'none',colorSpaceConversion:'none'});
-   if(!this.alive){bitmap.close();return;}this.bitmaps.push(bitmap);tex.image=bitmap;tex.flipY=false;tex.needsUpdate=true;
-  }).catch(()=>{this.failures.push(file);}));
+  // Native image decoding works across Safari versions; mobile files are pre-sized.
+  const image=new Image();image.decoding='async';
+  this.pending.push(new Promise<void>(resolve=>{
+   const timer=window.setTimeout(()=>{this.failures.push(file);resolve();},25000);
+   image.onload=()=>{clearTimeout(timer);if(this.alive){tex.image=image;tex.needsUpdate=true;}resolve();};
+   image.onerror=()=>{clearTimeout(timer);this.failures.push(file);resolve();};
+   image.src=assetUrl('/materials/usach-originals/'+(this.mobile?'mobile/':'')+file);
+  }));
   return tex;
  }
  apply(m:THREE.MeshStandardMaterial,key:PhotoSampleKey,options:{size?:[number,number];color?:string;contrast?:number;relief?:number;grout?:number;rotation?:number}={}){
@@ -114,13 +113,13 @@ export class PhotoMaterials{
  }
  glazing(name:string,zone:'exterior'|'interior'|'classroom'='interior'){
   const exterior=zone==='exterior';
-  const m=new THREE.MeshPhysicalMaterial({name,side:THREE.DoubleSide,color:exterior?'#d2e1e3':'#eef5f4',metalness:0,roughness:exterior?.095:.065,transmission:this.mobile?.85:.92,thickness:.025,ior:1.5,opacity:1,transparent:false,envMapIntensity:1.1});
+  const m=new THREE.MeshPhysicalMaterial({name,side:THREE.DoubleSide,color:exterior?'#d2e1e3':'#eef5f4',metalness:0,roughness:exterior?.095:.065,transmission:this.mobile?0:.92,thickness:.025,ior:1.5,opacity:this.mobile?(exterior?.68:.18):1,transparent:this.mobile,depthWrite:!this.mobile,envMapIntensity:1.1});
   m.userData.reflectionZone=zone;this.glass.add(m);this.materials.add(m);return m;
  }
  paint(m:THREE.MeshStandardMaterial,key:PhotoSampleKey){
   const physical=new THREE.MeshPhysicalMaterial();THREE.MeshStandardMaterial.prototype.copy.call(physical,m);
   physical.defines={STANDARD:'',PHYSICAL:''};
-  physical.clearcoat=.55;physical.clearcoatRoughness=.16;
+  physical.clearcoat=this.mobile?0:.55;physical.clearcoatRoughness=.16;
   return this.apply(physical,key);
  }
  tuneModel(root:THREE.Group){
@@ -154,5 +153,5 @@ export class PhotoMaterials{
   });
  }
  async ready(){await Promise.all(this.pending);}
- dispose(){this.alive=false;this.materials.forEach(m=>m.dispose());this.textures.forEach(t=>t.dispose());this.bitmaps.forEach(b=>b.close());}
+ dispose(){this.alive=false;this.materials.forEach(m=>m.dispose());this.textures.forEach(t=>t.dispose());}
 }
