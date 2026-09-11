@@ -2,6 +2,8 @@
 
 Demostración de una landing inmersiva con contenido FAE USACH, preparada para revisión y presentación. No es el sitio oficial de admisión.
 
+[Abrir la maqueta online](https://maescobarn.github.io/maqueta-fae-experiencia-3d/)
+
 ## Alcance
 
 - Recorrido por el exterior, hall, escaleras y auditorio, ligado al scroll.
